@@ -25,7 +25,7 @@ function SectionHead({ eyebrow, title, sub, center, light }) {
 function CategoryCard({ cat }) {
   const { nav } = useStore();
   return (
-    <div className="card cat-card" onClick={() => nav("product", cat.id)}>
+    <div className="card cat-card" onClick={() => nav("product", cat.slug || cat.id)}>
       <ProductMedia kind={cat.kind} tone={cat.tone} label={cat.name.toLowerCase().replace(/ /g, "-")} />
       <div className="cat-body">
         <h3>{cat.name}</h3>
@@ -41,17 +41,17 @@ function CategoryCard({ cat }) {
 
 function ProductCard({ p, onAdd }) {
   const { nav } = useStore();
-  const go = () => nav("product", p.id);
+  const go = () => nav("product", p.slug || p.id);
   return (
     <div className="card prod-card">
-      <div style={{ position: "relative" }} onClick={go}>
+      <div className="cursor-pointer" style={{ position: "relative" }} onClick={go}>
         <ProductMedia kind={p.kind} tone={p.tone} label={p.kind} />
         {p.tag && <span className={"prod-tag chip " + (p.tagType || "accent")}>{p.tag}</span>}
         <button className="prod-fav" onClick={(e) => { e.stopPropagation(); }} aria-label="Favori"><Icon name="heart" w={16} /></button>
       </div>
       <div className="prod-body">
         <span className="prod-cat">{p.cat}</span>
-        <h3 onClick={go} style={{ cursor: "pointer" }}>{p.name}</h3>
+        <h3 className="cursor-pointer" onClick={go}>{p.name}</h3>
         <div className="prod-rate"><Stars value={p.rating} /> <span>{p.rating} ({p.reviews})</span></div>
         <p className="pdesc">{p.desc}</p>
         <div className="prod-foot">
@@ -86,9 +86,9 @@ function Toasts() {
 /* Quick add helper: build a default line from a product */
 function quickAdd(store, p) {
   store.addToCart({
-    lineKey: p.id + "|hızlı",
-    id: p.id, name: p.name, kind: p.kind, tone: p.tone,
-    opts: "Standart seçenekler", qty: 1, lineTotal: p.price, unit: p.unit,
+    productId: p.id,
+    name: p.name,
+    qty: 1,
   });
 }
 

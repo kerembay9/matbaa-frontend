@@ -192,7 +192,7 @@ function MediaArt({ kind, c1, c2 }) {
 }
 
 /* ---------- Kategoriler ---------- */
-const CATEGORIES = [
+const CATEGORIES_FALLBACK = [
   { id: "kartvizit", name: "Kartvizit", kind: "kartvizit", tone: "navy", desc: "Mat, parlak, lakeli ve özel kesim seçenekleriyle.", from: 149, slug: "kartvizit" },
   { id: "brosur", name: "Broşür", kind: "brosur", tone: "orange", desc: "Tek/çift kırım, A4–A5 ebatlarında canlı baskı.", from: 380, slug: "brosur" },
   { id: "katalog", name: "Katalog", kind: "katalog", tone: "slate", desc: "Tel dikiş veya amerikan cilt, kuşe kağıt.", from: 1250, slug: "katalog" },
@@ -206,7 +206,7 @@ const CATEGORIES = [
 ];
 
 /* ---------- Ürünler ---------- */
-const PRODUCTS = [
+const PRODUCTS_FALLBACK = [
   { id: "p1", name: "Lüks Kartvizit", cat: "Kartvizit", catId: "kartvizit", kind: "kartvizit", tone: "navy", price: 149, unit: "/ 500 adet", rating: 4.9, reviews: 218, tag: "Çok Satan", tagType: "accent", desc: "350gr kuşe, mat selefon kaplama. 1–2 gün teslim.", badge: true },
   { id: "p2", name: "Tek Kırım Broşür", cat: "Broşür", catId: "brosur", kind: "brosur", tone: "orange", price: 380, unit: "/ 250 adet", rating: 4.8, reviews: 96, tag: "Yeni", tagType: "ink", desc: "A4 çift yön, 135gr parlak kuşe baskı." },
   { id: "p3", name: "Vitrin Afişi", cat: "Afiş", catId: "afis", kind: "afis", tone: "magenta", price: 95, unit: "/ adet", rating: 4.7, reviews: 64, desc: "70×100 cm, canlı renk, mat veya parlak." },
@@ -248,4 +248,6 @@ const FAQS = [
   { q: "Baskı öncesi prova görebilir miyim?", a: "Talep etmeniz halinde dijital prova (PDF) paylaşırız. Onayınız alınmadan iş baskıya girmez, böylece sürpriz sonuçlarla karşılaşmazsınız." },
 ];
 
-Object.assign(window, { Icon, ProductMedia, MediaArt, CATEGORIES, PRODUCTS, FEATURES, STEPS, TESTIMONIALS, FAQS });
+window.CATEGORIES = window.CATEGORIES || CATEGORIES_FALLBACK;
+window.PRODUCTS = window.PRODUCTS || PRODUCTS_FALLBACK;
+Object.assign(window, { Icon, ProductMedia, MediaArt, FEATURES, STEPS, TESTIMONIALS, FAQS });

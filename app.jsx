@@ -57,18 +57,43 @@ function TweakControls() {
   );
 }
 
+function AppShell() {
+  const { catalogLoading, cartLoading } = useStore();
+  if (catalogLoading || cartLoading) {
+    return (
+      <div className="app-root" style={{ minHeight: "60vh", display: "grid", placeItems: "center", color: "var(--muted)", fontFamily: "var(--font-head)", fontWeight: 600 }}>
+        Yükleniyor…
+      </div>
+    );
+  }
+  if (window.CATALOG_ERROR) {
+    return (
+      <div className="app-root" style={{ minHeight: "60vh", display: "grid", placeItems: "center", padding: 24, textAlign: "center" }}>
+        <div>
+          <h2 style={{ marginBottom: 8 }}>Backend bağlantısı kurulamadı</h2>
+          <p className="text-muted">{window.CATALOG_ERROR}</p>
+          <p className="text-muted" style={{ marginTop: 8, fontSize: 14 }}>{window.MATBAA_CONFIG?.API_BASE} · tenant: {window.MATBAA_CONFIG?.TENANT_ID}</p>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="app-root">
+      <Header />
+      <Router />
+      <Footer />
+      <Drawer />
+      <WhatsApp />
+      <Toasts />
+      <TweakControls />
+    </div>
+  );
+}
+
 function App() {
   return (
     <StoreProvider>
-      <div className="app-root">
-        <Header />
-        <Router />
-        <Footer />
-        <Drawer />
-        <WhatsApp />
-        <Toasts />
-        <TweakControls />
-      </div>
+      <AppShell />
     </StoreProvider>
   );
 }

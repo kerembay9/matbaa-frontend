@@ -84,7 +84,7 @@ function Why() {
   return (
     <section className="section why">
       <div className="wrap">
-        <SectionHead eyebrow="Neden Bayramoğlu Matbaa?" title="Baskı işiniz emin ellerde" sub="Binlerce bireysel ve kurumsal müşterinin tercih ettiği güvenilir baskı partneri." center light />
+        <SectionHead eyebrow="Neden Simge Matbaa?" title="Baskı işiniz emin ellerde" sub="Binlerce bireysel ve kurumsal müşterinin tercih ettiği güvenilir baskı partneri." center light />
         <div className="grid cols-3 feat-grid">
           {FEATURES.map((f, i) => (
             <div className="feat" key={i}>

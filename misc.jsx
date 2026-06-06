@@ -6,7 +6,7 @@ function AboutPage() {
   const { nav } = useStore();
   return (
     <div className="page">
-      <PageHead crumb="Hakkımızda" title="Bayramoğlu Matbaa" sub="Baskıya gönül vermiş bir ekibin, kaliteyi herkes için erişilebilir kılma hikayesi." />
+      <PageHead crumb="Hakkımızda" title="Simge Matbaa" sub="Baskıya gönül vermiş bir ekibin, kaliteyi herkes için erişilebilir kılma hikayesi." />
       <section className="section-sm"><div className="wrap">
         <div className="about-hero">
           <div>
@@ -60,7 +60,7 @@ function ServicesPage() {
       <section className="section-sm"><div className="wrap">
         <div className="grid cols-3">
           {CATEGORIES.map(c => (
-            <div className="card" key={c.id} style={{ padding: 26, cursor: "pointer" }} onClick={() => nav("product", c.id)}>
+            <div className="card cursor-pointer" key={c.id} style={{ padding: 26 }} onClick={() => nav("product", c.id)}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
                 <span style={{ width: 50, height: 50, borderRadius: 13, background: "var(--paper-3)", display: "grid", placeItems: "center", color: "var(--accent)" }}>
                   <Icon name={serviceIcon(c.id)} w={24} />
@@ -117,7 +117,7 @@ function ContactPage() {
       <section className="section-sm"><div className="wrap">
         <div className="contact-layout">
           <div>
-            {[["pin", "Adres", "Merkez Mah. Matbaacılar Sk. No:12, İstanbul"], ["phone", "Telefon", "0212 000 00 00"], ["mail", "E-posta", "info@bayramoglumatbaa.com"], ["clock", "Çalışma Saatleri", "Hafta içi 09:00 – 18:30"]].map(([ic, t, d], i) => (
+            {[["pin", "Adres", "Merkez Mah. Matbaacılar Sk. No:12, İstanbul"], ["phone", "Telefon", "0212 000 00 00"], ["mail", "E-posta", "info@simgematbaa.com"], ["clock", "Çalışma Saatleri", "Hafta içi 09:00 – 18:30"]].map(([ic, t, d], i) => (
               <div className="card contact-info-card" key={i}>
                 <span className="cic"><Icon name={ic} w={22} /></span>
                 <div><small>{t}</small><b>{d}</b></div>

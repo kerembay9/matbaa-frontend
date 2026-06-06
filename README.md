@@ -1,6 +1,6 @@
-# Bayramoğlu Matbaa — Frontend
+# Simge Matbaa — Frontend
 
-Standalone static frontend for the Bayramoğlu Matbaa print shop (React SPA, no build step).
+Standalone static frontend for the Simge Matbaa print shop (React SPA, no build step).
 
 ## Contents
 
@@ -8,7 +8,12 @@ Standalone static frontend for the Bayramoğlu Matbaa print shop (React SPA, no 
 - `*.jsx` — React components (loaded via Babel in the browser)
 - `*.css` — design system, page styles, hero animation
 
-Cart and checkout use browser `localStorage` (prototype/demo). For live e-commerce with Postgres cart and payment, use the `ecommerce-template` app with `themeId=matbaa`.
+Connected to the shared backend at `webdeploy.horizonzeta.com` (tenant: `simge-matbaa`). Cart, catalog, and checkout use REST APIs with `x-tenant-id` + `x-cart-session` headers.
+
+Hardcoded in `config.js`:
+- `API_BASE`: `https://webdeploy.horizonzeta.com`
+- `TENANT_ID`: `simge-matbaa`
+- Frontend URL: `https://simge-matbaa.netlify.app` (allowed CORS origin on backend)
 
 ## Local preview
 

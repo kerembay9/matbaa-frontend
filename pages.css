@@ -1,5 +1,5 @@
 /* ============================================================
-   Bayramoğlu Matbaa — Sayfa Stilleri
+   Simge Matbaa — Sayfa Stilleri
    ============================================================ */
 
 /* ---------- HERO ---------- */
@@ -82,7 +82,7 @@
 .prod-card:hover { transform: translateY(-5px); box-shadow: var(--sh-lg); border-color: var(--line-2); }
 .prod-card .media { border-radius: 0; }
 .prod-tag { position:absolute; top: 11px; left: 11px; z-index: 5; }
-.prod-fav { position:absolute; top: 10px; right: 10px; z-index: 5; width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.9); border: 1px solid var(--line); display:grid; place-items:center; color: var(--ink-500); transition: all .18s; }
+.prod-fav { position:absolute; top: 10px; right: 10px; z-index: 5; width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.9); border: 1px solid var(--line); display:grid; place-items:center; color: var(--ink-500); transition: all .18s; cursor: pointer; }
 .prod-fav:hover { color: var(--accent); transform: scale(1.08); }
 .prod-fav svg { width: 16px; height: 16px; }
 .prod-body { padding: 16px 17px 17px; display:flex; flex-direction: column; gap: 6px; flex:1; }
@@ -169,7 +169,7 @@
   display:inline-flex; align-items:center; gap: 9px; padding: 10px 15px; border:1px solid var(--line-2);
   border-radius: var(--r-pill); background:#fff; font-size: 14px; font-weight: 600; color: var(--ink-700);
 }
-.select select { border:none; background:transparent; outline:none; font-weight:600; color:var(--ink); }
+.select select { border:none; background:transparent; outline:none; font-weight:600; color:var(--ink); cursor: pointer; }
 
 /* ============================================================
    PRODUCT DETAIL
@@ -238,7 +238,7 @@
 /* tabs */
 .pdp-tabs { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 22px; }
 .tab-heads { display:flex; gap: 6px; margin-bottom: 18px; }
-.tab-heads button { padding: 9px 16px; border-radius: var(--r-pill); border:none; background: transparent; font-family: var(--font-head); font-weight: 600; font-size: 14px; color: var(--muted); }
+.tab-heads button { padding: 9px 16px; border-radius: var(--r-pill); border:none; background: transparent; font-family: var(--font-head); font-weight: 600; font-size: 14px; color: var(--muted); cursor: pointer; }
 .tab-heads button.on { background: var(--ink); color:#fff; }
 .tab-body { font-size: 14.5px; color: var(--ink-700); line-height: 1.7; }
 .tab-body ul { display:flex; flex-direction: column; gap: 9px; }
@@ -256,7 +256,7 @@
 .cart-item .ci-opts { font-size: 13px; color: var(--muted); }
 .cart-item .ci-right { text-align:right; display:flex; flex-direction: column; align-items:flex-end; gap: 10px; }
 .cart-item .ci-price { font-family: var(--font-head); font-weight: 700; font-size: 18px; }
-.ci-remove { font-size: 13px; color: var(--muted); display:inline-flex; gap: 5px; align-items:center; }
+.ci-remove { font-size: 13px; color: var(--muted); display:inline-flex; gap: 5px; align-items:center; cursor: pointer; }
 .ci-remove:hover { color: var(--accent); }
 .ci-remove svg { width: 14px; height: 14px; }
 
@@ -357,7 +357,7 @@
 
 /* mobile drawer */
 .drawer-overlay { position: fixed; inset:0; background: rgba(17,32,58,.4); z-index: 100; opacity:0; pointer-events:none; transition: opacity .25s; }
-.drawer-overlay.open { opacity:1; pointer-events:auto; }
+.drawer-overlay.open { opacity:1; pointer-events:auto; cursor: pointer; }
 .drawer { position: fixed; top:0; right:0; bottom:0; width: 320px; max-width: 86vw; background:#fff; z-index: 101; transform: translateX(100%); transition: transform .3s cubic-bezier(.3,.8,.3,1); display:flex; flex-direction:column; }
 .drawer.open { transform: none; }
 .drawer-head { display:flex; align-items:center; justify-content: space-between; padding: 20px; border-bottom: 1px solid var(--line); }

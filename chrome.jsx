@@ -13,12 +13,8 @@ const NAV_LINKS = [
 
 function Logo({ onClick, footer }) {
   return (
-    <div className="logo" onClick={onClick}>
-      <div className={"mark" + (footer ? " fmark" : "")}>B</div>
-      <div className="lname">
-        <b>Bayramoğlu</b>
-        <span>Matbaa</span>
-      </div>
+    <div className={"logo" + (footer ? " logo--footer" : "")} onClick={onClick}>
+      <img src="simge-logo.jpeg" alt="Simge Matbaa" className="logo-img" />
     </div>
   );
 }
@@ -140,12 +136,12 @@ function Footer() {
             <h4>İletişim</h4>
             <a><Icon name="pin" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />Merkez Mah. Matbaacılar Sk. No:12, İstanbul</a>
             <a><Icon name="phone" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />0212 000 00 00</a>
-            <a><Icon name="mail" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />info@bayramoglumatbaa.com</a>
+            <a><Icon name="mail" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />info@simgematbaa.com</a>
             <a><Icon name="clock" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />Hafta içi 09:00 – 18:30</a>
           </div>
         </div>
         <div className="fbot">
-          <span>© 2026 Bayramoğlu Matbaa. Tüm hakları saklıdır.</span>
+          <span>© 2026 Simge Matbaa. Tüm hakları saklıdır.</span>
           <span className="cmyk-dots" style={{ alignItems: "center" }}>
             <i></i><i></i><i></i><i></i>
             <span style={{ marginLeft: 8, fontFamily: "var(--font-head)", letterSpacing: ".04em" }}>CMYK ile basılmıştır</span>

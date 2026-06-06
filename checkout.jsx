@@ -82,9 +82,12 @@ function CartPage() {
 /* ---------- Çok adımlı ödeme ---------- */
 function CheckoutPage() {
   const store = useStore();
-  const { cart, cartTotal, nav, clearCart } = store;
+  const { cart, cartTotal, nav, clearCart, refreshCart, toast } = store;
   const [step, setStep] = useState(1);
-  const [orderNo] = useState(() => "BM-" + Math.floor(100000 + Math.random() * 900000));
+  const [orderNo, setOrderNo] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({ email: "", address: "", phone: "" });
+  const setField = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   if (!cart.length && step < 3) {
     return (
@@ -127,14 +130,38 @@ function CheckoutPage() {
         ) : (
           <div className="cart-layout">
             <div>
-              {step === 1 && <DeliveryForm />}
+              {step === 1 && <DeliveryForm form={form} setField={setField} />}
               {step === 2 && <PaymentForm />}
               <div style={{ display: "flex", gap: 12, marginTop: 22 }}>
                 {step === 1
                   ? <button className="btn btn-ghost" onClick={() => nav("cart")}>Sepete dön</button>
                   : <button className="btn btn-ghost" onClick={() => setStep(1)}>Geri</button>}
-                <button className="btn btn-primary" style={{ marginLeft: "auto" }} onClick={() => setStep(step + 1)}>
-                  {step === 1 ? "Ödemeye geç" : "Siparişi onayla"} <Icon name="arrow" w={17} />
+                <button className="btn btn-primary" style={{ marginLeft: "auto" }} disabled={submitting} onClick={async () => {
+                  if (step === 1) {
+                    if (!form.email || !form.address || form.address.length < 5) {
+                      toast("E-posta ve adres zorunludur");
+                      return;
+                    }
+                    setStep(2);
+                    return;
+                  }
+                  setSubmitting(true);
+                  try {
+                    const res = await MatbaaApi.checkout({
+                      email: form.email,
+                      address: form.address,
+                      phone: form.phone || undefined,
+                    });
+                    setOrderNo(res.orderId);
+                    await refreshCart();
+                    setStep(3);
+                  } catch (e) {
+                    toast(e.message || "Sipariş tamamlanamadı");
+                  } finally {
+                    setSubmitting(false);
+                  }
+                }}>
+                  {step === 1 ? "Ödemeye geç" : (submitting ? "İşleniyor…" : "Siparişi onayla")} <Icon name="arrow" w={17} />
                 </button>
               </div>
             </div>
@@ -162,7 +189,7 @@ function CheckoutPage() {
   );
 }
 
-function DeliveryForm() {
+function DeliveryForm({ form, setField }) {
   return (
     <div className="card form-card">
       <h3><span className="fn">1</span> Teslimat Bilgileri</h3>
@@ -171,10 +198,10 @@ function DeliveryForm() {
         <div className="field"><label>Soyad <span className="req">*</span></label><input placeholder="Soyadınız" /></div>
       </div>
       <div className="field-row">
-        <div className="field"><label>E-posta <span className="req">*</span></label><input placeholder="ornek@mail.com" type="email" /></div>
-        <div className="field"><label>Telefon <span className="req">*</span></label><input placeholder="0(5__) ___ __ __" /></div>
+        <div className="field"><label>E-posta <span className="req">*</span></label><input placeholder="ornek@mail.com" type="email" value={form.email} onChange={e => setField("email", e.target.value)} /></div>
+        <div className="field"><label>Telefon</label><input placeholder="0(5__) ___ __ __" value={form.phone} onChange={e => setField("phone", e.target.value)} /></div>
       </div>
-      <div className="field"><label>Adres <span className="req">*</span></label><textarea placeholder="Mahalle, cadde, sokak, no, daire"></textarea></div>
+      <div className="field"><label>Adres <span className="req">*</span></label><textarea placeholder="Mahalle, cadde, sokak, no, daire" value={form.address} onChange={e => setField("address", e.target.value)}></textarea></div>
       <div className="field-row">
         <div className="field"><label>İl</label>
           <select><option>İstanbul</option><option>Ankara</option><option>İzmir</option><option>Bursa</option><option>Antalya</option></select>

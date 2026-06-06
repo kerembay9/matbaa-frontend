@@ -74,7 +74,7 @@ function ProductsPage() {
                 {["hepsi", ...CATEGORIES.slice(0, 7).map(c => c.id)].map(id => {
                   const c = CATEGORIES.find(x => x.id === id);
                   return (
-                    <button key={id} className={"chip" + (active === id ? " ink" : "")} style={{ cursor: "pointer" }} onClick={() => setActive(id)}>
+                    <button key={id} className={"chip" + (active === id ? " ink" : "")} onClick={() => setActive(id)}>
                       {id === "hepsi" ? "Tümü" : c.name}
                     </button>
                   );
@@ -116,10 +116,10 @@ const QTY_TIERS = [
 ];
 
 function resolveProduct(id) {
-  let p = PRODUCTS.find(x => x.id === id);
+  let p = PRODUCTS.find(x => x.id === id || x.slug === id);
   if (p) return p;
-  const c = CATEGORIES.find(x => x.id === id);
-  if (c) return { id: c.id, name: c.name, cat: c.name, catId: c.id, kind: c.kind, tone: c.tone, price: c.from, unit: "/ baskı", rating: 4.8, reviews: 120, desc: c.desc };
+  const c = CATEGORIES.find(x => x.id === id || x.slug === id);
+  if (c) return { id: c.id, slug: c.slug || c.id, name: c.name, cat: c.name, catId: c.id, kind: c.kind, tone: c.tone, price: c.from, unit: "/ baskı", rating: 4.8, reviews: 120, desc: c.desc };
   return PRODUCTS[0];
 }
 
@@ -147,11 +147,17 @@ function ProductDetailPage({ id }) {
 
   const addToCart = () => {
     const optStr = `${cfg.ebat.opts[sel.ebat][0]} · ${cfg.kagit.opts[sel.kagit][0]} · ${qtyCount} adet`;
+    const lineKey = `${p.id}|${sel.ebat}-${sel.kagit}-${sel.kaplama}-${sel.yon}-${tier}-${needDesign ? 1 : 0}`;
     store.addToCart({
-      lineKey: `${p.id}|${sel.ebat}-${sel.kagit}-${sel.kaplama}-${sel.yon}-${tier}-${needDesign}`,
-      id: p.id, name: p.name, kind: p.kind, tone: p.tone,
-      opts: optStr + (needDesign ? " · + Tasarım" : "") + (file ? " · dosya yüklendi" : ""),
-      qty: 1, lineTotal: total, unit: `${qtyCount} adet`,
+      productId: p.id,
+      lineKey,
+      name: p.name,
+      optionsJson: { ebat: sel.ebat, kagit: sel.kagit, kaplama: sel.kaplama, yon: sel.yon, tier, needDesign },
+      optionsLabel: optStr + (needDesign ? " · + Tasarım" : "") + (file ? " · dosya yüklendi" : ""),
+      qty: 1,
+      unitPrice: total,
+      lineTotal: total,
+      unit: `${qtyCount} adet`,
     });
   };
   const buyNow = () => { addToCart(); store.nav("checkout"); };
