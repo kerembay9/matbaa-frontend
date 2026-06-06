@@ -130,7 +130,6 @@ function ProductDetailPage({ id }) {
   const cfg = OPTION_SETS.default;
   const [sel, setSel] = useState({ ebat: 0, kagit: 0, kaplama: 0, yon: 1 });
   const [tier, setTier] = useState(2);
-  const [thumb, setThumb] = useState(0);
   const [tab, setTab] = useState("aciklama");
   const [needDesign, setNeedDesign] = useState(false);
   const [artwork, setArtwork] = useState(null);
@@ -143,8 +142,6 @@ function ProductDetailPage({ id }) {
   const subtotal = Math.round(unitBase * optMult * qtyMult);
   const total = subtotal + designFee;
   const qtyCount = QTY_TIERS[tier][0];
-
-  const tones = ["navy", "magenta", "green", "orange"];
 
   const addToCart = () => {
     const optStr = `${cfg.ebat.opts[sel.ebat][0]} · ${cfg.kagit.opts[sel.kagit][0]} · ${qtyCount} adet`;
@@ -177,14 +174,7 @@ function ProductDetailPage({ id }) {
           <div className="pdp">
             <div className="pdp-gallery">
               <div className="pdp-main">
-                <ProductMedia kind={p.kind} tone={tones[thumb]} label={p.kind} />
-              </div>
-              <div className="pdp-thumbs">
-                {tones.map((t, i) => (
-                  <div key={i} className={"pdp-thumb" + (thumb === i ? " on" : "")} onClick={() => setThumb(i)}>
-                    <ProductMedia kind={p.kind} tone={t} />
-                  </div>
-                ))}
+                <ProductMedia kind={p.kind} tone={p.tone || "navy"} label={p.kind} />
               </div>
             </div>
 
