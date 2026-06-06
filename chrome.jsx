@@ -114,10 +114,7 @@ function Footer() {
             <Logo onClick={() => nav("home")} footer />
             <p className="fdesc">Kartvizitten brandaya, davetiyeden ambalaja tüm baskı ihtiyaçlarınız için online sipariş platformu. Kalite, hız ve güven bir arada.</p>
             <div className="fsocial">
-              <a aria-label="Instagram"><Icon name="ig" w={17} /></a>
-              <a aria-label="Facebook"><Icon name="fb" w={17} /></a>
-              <a aria-label="LinkedIn"><Icon name="in" w={17} /></a>
-              <a aria-label="X"><Icon name="x" w={17} /></a>
+              <a aria-label="Instagram">https://www.instagram.com/antakyasimgeofset/<Icon name="ig" w={17} /></a>
             </div>
           </div>
           <div className="fcol">
