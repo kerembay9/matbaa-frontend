@@ -42,26 +42,29 @@ async function api(path, opts = {}) {
   return data;
 }
 
-async function uploadArtwork(file) {
-  const { API_BASE, TENANT_ID } = cfg();
-  const fd = new FormData();
-  fd.append('file', file);
-  const res = await fetch(API_BASE + '/api/upload', {
-    method: 'POST',
-    headers: {
-      'x-tenant-id': TENANT_ID,
-      'x-cart-session': getCartSession(),
-    },
-    body: fd,
-    credentials: 'include',
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const out = reader.result;
+      if (typeof out !== 'string') {
+        reject(new Error('read_failed'));
+        return;
+      }
+      const comma = out.indexOf(',');
+      resolve(comma >= 0 ? out.slice(comma + 1) : out);
+    };
+    reader.onerror = () => reject(new Error('read_failed'));
+    reader.readAsDataURL(file);
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const err = new Error(data.error || res.statusText || 'upload_failed');
-    err.status = res.status;
-    throw err;
-  }
-  return data;
+}
+
+async function uploadArtwork(file) {
+  const data = await fileToBase64(file);
+  return api('/api/upload', {
+    method: 'POST',
+    body: JSON.stringify({ name: file.name, data }),
+  });
 }
 
 function mapSearchItem(p) {
