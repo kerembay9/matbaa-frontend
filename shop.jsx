@@ -133,6 +133,8 @@ function ProductDetailPage({ id }) {
   const [thumb, setThumb] = useState(0);
   const [tab, setTab] = useState("aciklama");
   const [needDesign, setNeedDesign] = useState(false);
+  const [artwork, setArtwork] = useState(null);
+  const { toast } = store;
 
   const unitBase = p.price / 3.4; // normalize to per-100 baseline
   const optMult = 1 + cfg.ebat.opts[sel.ebat][1] + cfg.kagit.opts[sel.kagit][1] + cfg.kaplama.opts[sel.kaplama][1] + cfg.yon.opts[sel.yon][1];
@@ -146,13 +148,20 @@ function ProductDetailPage({ id }) {
 
   const addToCart = () => {
     const optStr = `${cfg.ebat.opts[sel.ebat][0]} · ${cfg.kagit.opts[sel.kagit][0]} · ${qtyCount} adet`;
-    const lineKey = `${p.id}|${sel.ebat}-${sel.kagit}-${sel.kaplama}-${sel.yon}-${tier}-${needDesign ? 1 : 0}`;
+    const baseKey = `${p.id}|${sel.ebat}-${sel.kagit}-${sel.kaplama}-${sel.yon}-${tier}-${needDesign ? 1 : 0}`;
+    const lineKey = artwork?.name ? `${baseKey}-f${artworkFileSlug(artwork.name)}` : baseKey;
+    const optionsJson = {
+      ebat: sel.ebat, kagit: sel.kagit, kaplama: sel.kaplama, yon: sel.yon, tier, needDesign,
+      ...(artwork ? { fileUrl: artwork.url, fileName: artwork.name } : {}),
+    };
+    let optionsLabel = optStr + (needDesign ? " · + Tasarım" : "");
+    if (artwork?.name) optionsLabel += ` · ${artwork.name}`;
     store.addToCart({
       productId: p.id,
       lineKey,
       name: p.name,
-      optionsJson: { ebat: sel.ebat, kagit: sel.kagit, kaplama: sel.kaplama, yon: sel.yon, tier, needDesign },
-      optionsLabel: optStr + (needDesign ? " · + Tasarım" : ""),
+      optionsJson,
+      optionsLabel,
       qty: 1,
       unitPrice: total,
       lineTotal: total,
@@ -212,11 +221,23 @@ function ProductDetailPage({ id }) {
               </div>
 
               <div className="opt-block">
-                <label className="filter-opt" onClick={() => setNeedDesign(v => !v)}>
+                <label className="filter-opt" onClick={() => { setNeedDesign(v => { if (!v) setArtwork(null); return !v; }); }}>
                   <span className={"box" + (needDesign ? "" : "")} style={needDesign ? { background: "var(--accent)", borderColor: "var(--accent)", color: "#fff" } : null}><Icon name="check" w={12} /></span>
                   Dosyam yok, tasarım desteği istiyorum <span className="cnt">+{tl(750)}</span>
                 </label>
               </div>
+
+              {!needDesign && (
+                <div className="opt-block">
+                  <div className="olab"><span>Baskı Dosyası</span><small>CMYK, 300 DPI önerilir</small></div>
+                  <ArtworkUpload
+                    value={artwork}
+                    onChange={setArtwork}
+                    disabled={needDesign}
+                    onError={(msg) => toast(msg, "error")}
+                  />
+                </div>
+              )}
 
               {/* price summary */}
               <div className="price-summary">

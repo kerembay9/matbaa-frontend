@@ -107,6 +107,76 @@ function Toasts() {
   );
 }
 
+const ARTWORK_ACCEPT = ".pdf,.ai,.psd,.jpg,.jpeg,.png";
+const ARTWORK_MAX_MB = 25;
+
+function artworkFileSlug(name) {
+  return (name || "").toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 16) || "file";
+}
+
+function ArtworkUpload({ value, onChange, disabled, onError }) {
+  const inputRef = React.useRef(null);
+  const [busy, setBusy] = React.useState(false);
+
+  const pick = () => {
+    if (!disabled && !busy) inputRef.current?.click();
+  };
+
+  const onFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!/\.(pdf|ai|psd|jpe?g|png)$/i.test(file.name)) {
+      onError?.("PDF, AI, PSD, JPG veya PNG yükleyin");
+      e.target.value = "";
+      return;
+    }
+    if (file.size > ARTWORK_MAX_MB * 1024 * 1024) {
+      onError?.("Dosya " + ARTWORK_MAX_MB + " MB sınırını aşıyor");
+      e.target.value = "";
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await MatbaaApi.uploadArtwork(file);
+      onChange({ url: res.url, name: res.name || file.name });
+    } catch (err) {
+      onError?.(err.message || "Dosya yüklenemedi");
+    } finally {
+      setBusy(false);
+      e.target.value = "";
+    }
+  };
+
+  const clear = (ev) => {
+    ev.stopPropagation();
+    onChange(null);
+  };
+
+  return (
+    <div className={"upload" + (value ? " has" : "") + (disabled ? " disabled" : "")} onClick={pick} role="button" tabIndex={disabled ? -1 : 0}>
+      <input ref={inputRef} type="file" hidden accept={ARTWORK_ACCEPT} onChange={onFile} disabled={disabled || busy} />
+      <div className="uic"><Icon name={value ? "check" : "upload"} w={23} /></div>
+      {busy ? (
+        <>
+          <b>Dosya yükleniyor…</b>
+          <small>Lütfen bekleyin</small>
+        </>
+      ) : value ? (
+        <>
+          <b>{value.name}</b>
+          <small>Yüklendi — değiştirmek için tıklayın</small>
+          <button type="button" className="btn btn-ghost btn-sm" style={{ marginTop: 10 }} onClick={clear}>Kaldır</button>
+        </>
+      ) : (
+        <>
+          <b>Baskı dosyası yükle</b>
+          <small>PDF, AI, PSD, JPG veya PNG · max {ARTWORK_MAX_MB} MB</small>
+        </>
+      )}
+    </div>
+  );
+}
+
 /* Quick add helper: build a default line from a product */
 function quickAdd(store, p) {
   store.addToCart({
@@ -116,4 +186,4 @@ function quickAdd(store, p) {
   });
 }
 
-Object.assign(window, { Stars, SectionHead, CategoryCard, ProductCard, ReferencesSection, Toasts, quickAdd });
+Object.assign(window, { Stars, SectionHead, CategoryCard, ProductCard, ReferencesSection, Toasts, ArtworkUpload, artworkFileSlug, quickAdd });

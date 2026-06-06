@@ -42,6 +42,28 @@ async function api(path, opts = {}) {
   return data;
 }
 
+async function uploadArtwork(file) {
+  const { API_BASE, TENANT_ID } = cfg();
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await fetch(API_BASE + '/api/upload', {
+    method: 'POST',
+    headers: {
+      'x-tenant-id': TENANT_ID,
+      'x-cart-session': getCartSession(),
+    },
+    body: fd,
+    credentials: 'include',
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err = new Error(data.error || res.statusText || 'upload_failed');
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
 function mapSearchItem(p) {
   const known = (window.PRODUCTS || []).find(x => x.id === p.id || x.slug === p.slug);
   if (known) return known;
@@ -98,6 +120,7 @@ const MatbaaApi = {
   submitContact: (body) => api('/api/contact', { method: 'POST', body: JSON.stringify(body) }),
   submitQuote: (body) => api('/api/contact', { method: 'POST', body: JSON.stringify({ type: 'quote', ...body }) }),
   search: (q) => api('/api/search?q=' + encodeURIComponent(q)).then(items => items.map(mapSearchItem)),
+  uploadArtwork: (file) => uploadArtwork(file),
   mapCartItems: (cart) => (cart?.items || []).map(mapCartItem),
   mapSearchItems: (items) => (items || []).map(mapSearchItem),
   cartCount: (cart) => (cart?.items || []).reduce((n, x) => n + x.qty, 0),
