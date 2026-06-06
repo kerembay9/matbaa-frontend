@@ -1,0 +1,179 @@
+/* ============================================================
+   hero-anim.css — Matbaa baskı animasyonu (CMYK registration)
+   Tek 6.4sn döngü; tüm öğeler aynı zaman çizelgesine senkron.
+   ============================================================ */
+.press { position: absolute; inset: 0; display: grid; place-items: center; }
+
+.press-machine {
+  --d: 6.4s;
+  position: relative; width: 82%; max-width: 360px; aspect-ratio: 1 / 1.16;
+  background: #fff; border: 1px solid var(--line); border-radius: 24px;
+  box-shadow: var(--sh-lg); overflow: hidden; display: flex; flex-direction: column;
+}
+
+/* makine başlığı / silindirler */
+.pm-top {
+  height: 56px; background: var(--ink); display: flex; align-items: center;
+  gap: 12px; padding: 0 18px; color: #fff; flex-shrink: 0; position: relative; z-index: 4;
+}
+.pm-rollers { display: flex; gap: 7px; }
+.pm-roller {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(255,255,255,.18) 0 25%, rgba(255,255,255,.05) 25% 50%, rgba(255,255,255,.18) 50% 75%, rgba(255,255,255,.05) 75% 100%);
+  border: 2px solid rgba(255,255,255,.35); animation: pm-spin 1.6s linear infinite;
+}
+.pm-roller:nth-child(2){ animation-direction: reverse; }
+.pm-title { font-family: var(--font-head); font-weight: 700; font-size: 13px; letter-spacing: .14em; }
+.pm-cmyk { margin-left: auto; display: flex; gap: 5px; }
+.pm-cmyk i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+.pm-cmyk i:nth-child(1){ background: #1fb6d8; } .pm-cmyk i:nth-child(2){ background: #e5388f; }
+.pm-cmyk i:nth-child(3){ background: #f5c517; } .pm-cmyk i:nth-child(4){ background: #fff; }
+
+/* baskı yatağı */
+.pm-bed {
+  flex: 1; position: relative; background: var(--paper-2);
+  display: grid; place-items: center; overflow: hidden;
+}
+.pm-bed::before {
+  content: ""; position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(17,32,58,.05) 1px, transparent 1px);
+  background-size: 13px 13px;
+}
+
+/* kağıt */
+.sheet {
+  position: relative; width: 64%; aspect-ratio: 3/4; background: #fff;
+  border-radius: 6px; box-shadow: 0 16px 30px -14px rgba(17,32,58,.45), 0 2px 6px rgba(17,32,58,.12);
+  overflow: hidden; animation: sheetCycle var(--d) cubic-bezier(.6,.05,.3,1) infinite;
+}
+
+/* renk katmanları — multiply ile gerçek CMYK üst üste binme */
+.ly { position: absolute; inset: 0; }
+.ly .sh { position: absolute; }
+.ly-c { mix-blend-mode: multiply; animation: regC var(--d) cubic-bezier(.5,.1,.2,1) infinite; }
+.ly-m { mix-blend-mode: multiply; animation: regM var(--d) cubic-bezier(.5,.1,.2,1) infinite; }
+.ly-y { mix-blend-mode: multiply; animation: regY var(--d) cubic-bezier(.5,.1,.2,1) infinite; }
+.ly-k { mix-blend-mode: multiply; animation: regK var(--d) cubic-bezier(.5,.1,.2,1) infinite; }
+
+.ly-c .sh { background: #1fb6d8; } /* camgöbeği */
+.ly-m .sh { background: #e5388f; } /* macenta */
+.ly-y .sh { background: #f5c517; } /* sarı */
+.ly-k .sh { background: #11203a; } /* siyah (key) */
+
+/* motif şekilleri — basit blok/daire/bar */
+.sh.band  { top: 9%; left: 9%; right: 9%; height: 30%; border-radius: 4px; }
+.sh.circ  { top: 14%; right: 14%; width: 34%; aspect-ratio: 1; border-radius: 50%; }
+.sh.blob  { bottom: 9%; left: 9%; right: 9%; height: 22%; border-radius: 4px; }
+.sh.bar   { left: 14%; height: 6px; border-radius: 3px; }
+.sh.bar.t1{ top: 50%; width: 58%; }
+.sh.bar.t2{ top: 60%; width: 40%; }
+.sh.frame { inset: 6px; background: transparent !important; border: 2px solid #11203a; border-radius: 6px; }
+
+/* kayıt (registration) işaretleri */
+.sheet .reg { position: absolute; width: 13px; height: 13px; z-index: 6; pointer-events: none; animation: regPulse var(--d) ease-in-out infinite; }
+.sheet .reg::before, .sheet .reg::after { content: ""; position: absolute; background: rgba(17,32,58,.5); }
+.sheet .reg::before { left: 50%; top: 0; width: 1.4px; height: 100%; transform: translateX(-50%); }
+.sheet .reg::after  { top: 50%; left: 0; height: 1.4px; width: 100%; transform: translateY(-50%); }
+.sheet .reg.tl { top: 4px; left: 4px; } .sheet .reg.tr { top: 4px; right: 4px; }
+.sheet .reg.bl { bottom: 4px; left: 4px; } .sheet .reg.br { bottom: 4px; right: 4px; }
+
+/* baskı tarama çubuğu (silindir geçişi) */
+.roller-sweep {
+  position: absolute; left: -6%; right: -6%; height: 16%; z-index: 5; pointer-events: none;
+  background: linear-gradient(180deg, rgba(31,182,216,.0), rgba(31,182,216,.28) 30%, rgba(229,56,143,.28) 55%, rgba(245,197,23,.22) 80%, transparent);
+  box-shadow: 0 0 22px 6px rgba(17,32,58,.06); filter: blur(.3px);
+  animation: sweep var(--d) cubic-bezier(.5,.1,.3,1) infinite;
+}
+.roller-sweep::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: rgba(17,32,58,.4); }
+
+/* "hazır" rozeti */
+.pm-done {
+  position: absolute; z-index: 7; bottom: 14px; right: 14px;
+  display: flex; align-items: center; gap: 7px; background: var(--ink); color: #fff;
+  padding: 7px 13px; border-radius: 99px; font-family: var(--font-head); font-weight: 600; font-size: 12px;
+  box-shadow: var(--sh-lg); animation: doneIn var(--d) ease-out infinite;
+}
+.pm-done .dk { width: 16px; height: 16px; border-radius: 50%; background: #2c8c64; display: grid; place-items: center; }
+.pm-done .dk svg { width: 10px; height: 10px; }
+
+/* makine alt durum çubuğu */
+.pm-foot {
+  flex-shrink: 0; height: 40px; background: #fff; border-top: 1px solid var(--line);
+  display: flex; align-items: center; gap: 9px; padding: 0 16px; font-size: 12px; color: var(--muted);
+  font-family: var(--font-head); font-weight: 600; position: relative; z-index: 4;
+}
+.pm-foot .live { width: 7px; height: 7px; border-radius: 50%; background: #2c8c64; animation: blink 1.2s ease-in-out infinite; }
+.pm-foot b { color: var(--ink); }
+
+/* çıkış istifi */
+.out-stack { position: absolute; bottom: 52px; right: -22px; z-index: 3; width: 64px; height: 80px; }
+.out-sheet {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 80px; background: #fff;
+  border: 1px solid var(--line); border-radius: 5px; box-shadow: 0 6px 16px -8px rgba(17,32,58,.35);
+  overflow: hidden;
+}
+.out-sheet .ob { position: absolute; top: 8px; left: 8px; right: 8px; height: 28%; border-radius: 3px; background: var(--accent); opacity: .85; }
+.out-sheet .obc { position: absolute; top: 8px; right: 8px; width: 30%; aspect-ratio: 1; border-radius: 50%; background: var(--c-magenta); mix-blend-mode: multiply; }
+
+/* ---- keyframes ---- */
+@keyframes pm-spin { to { transform: rotate(360deg); } }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+
+@keyframes sheetCycle {
+  0%   { transform: translateY(46%) scale(.94); opacity: 0; }
+  9%   { transform: translateY(0) scale(1); opacity: 1; }
+  80%  { transform: translateY(0) scale(1); opacity: 1; }
+  93%, 100% { transform: translateY(-52%) scale(.93); opacity: 0; }
+}
+@keyframes regC {
+  0%, 12% { opacity: 0; transform: translate(-13px, -9px) rotate(-2deg); }
+  24%     { opacity: .92; }
+  50%, 80% { opacity: .92; transform: translate(0,0) rotate(0); }
+  92%,100% { opacity: 0; transform: translate(0,-6px); }
+}
+@keyframes regM {
+  0%, 16% { opacity: 0; transform: translate(12px, -8px) rotate(2deg); }
+  30%     { opacity: .92; }
+  52%, 80% { opacity: .92; transform: translate(0,0) rotate(0); }
+  92%,100% { opacity: 0; transform: translate(0,-6px); }
+}
+@keyframes regY {
+  0%, 20% { opacity: 0; transform: translate(-9px, 12px) rotate(-2deg); }
+  34%     { opacity: .92; }
+  54%, 80% { opacity: .92; transform: translate(0,0) rotate(0); }
+  92%,100% { opacity: 0; transform: translate(0,-6px); }
+}
+@keyframes regK {
+  0%, 30% { opacity: 0; transform: translate(7px, 6px); }
+  46%     { opacity: 1; }
+  58%, 80% { opacity: 1; transform: translate(0,0); }
+  92%,100% { opacity: 0; transform: translate(0,-6px); }
+}
+@keyframes sweep {
+  0%, 12% { transform: translateY(-160%); opacity: 0; }
+  16%     { opacity: 1; }
+  52%     { transform: translateY(620%); opacity: 1; }
+  56%, 100% { transform: translateY(620%); opacity: 0; }
+}
+@keyframes regPulse {
+  0%, 50% { opacity: .22; transform: scale(1); }
+  58%     { opacity: 1; transform: scale(1.25); }
+  72%,100% { opacity: .45; transform: scale(1); }
+}
+@keyframes doneIn {
+  0%, 56% { opacity: 0; transform: scale(.4) translateY(6px); }
+  63%     { opacity: 1; transform: scale(1) translateY(0); }
+  82%     { opacity: 1; }
+  88%,100% { opacity: 0; transform: scale(.9); }
+}
+
+/* erişilebilirlik: hareket azaltma */
+@media (prefers-reduced-motion: reduce) {
+  .sheet, .ly-c, .ly-m, .ly-y, .ly-k, .reg, .pm-done, .roller-sweep, .pm-roller, .pm-foot .live {
+    animation: none !important;
+  }
+  .ly { opacity: .92 !important; transform: none !important; }
+  .ly-k { opacity: 1 !important; }
+  .roller-sweep { display: none; }
+  .pm-done { opacity: 1 !important; transform: none !important; }
+}
