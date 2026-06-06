@@ -47,6 +47,7 @@ function AboutPage() {
           </div>
         </div>
       </div></section>
+      <ReferencesSection center />
       <CTAStrip />
     </div>
   );

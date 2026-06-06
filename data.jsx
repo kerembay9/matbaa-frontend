@@ -239,6 +239,27 @@ const TESTIMONIALS = [
   { quote: "Kurumsal kataloğumuz çok profesyonel oldu. Fiyat avantajlı, teslimat söz verilen günde. Kesinlikle tavsiye ederim.", name: "Selin Kaya", role: "Pazarlama Uzmanı", av: "SK" },
 ];
 
+const REFERENCES = [
+  { name: "Miri", src: "https://img.webme.com/pic/a/antakyasimgeofset/miri.jpg" },
+  { name: "Öz", src: "https://img.webme.com/pic/a/antakyasimgeofset/%C3%B6z.jpg" },
+  { name: "İnci Bulgur", src: "https://img.webme.com/pic/a/antakyasimgeofset/thumbnail_incibulgur.jpg" },
+  { name: "GY", src: "https://img.webme.com/pic/a/antakyasimgeofset/gy.jpg" },
+  { name: "RF", src: "https://img.webme.com/pic/a/antakyasimgeofset/rf.jpg" },
+  { name: "MRK", src: "https://img.webme.com/pic/a/antakyasimgeofset/mrk.jpg" },
+  { name: "M", src: "https://img.webme.com/pic/a/antakyasimgeofset/m.jpg" },
+  { name: "Akdeniz", src: "https://img.webme.com/pic/a/antakyasimgeofset/thumbnail_akdeniz.jpg" },
+  { name: "Kardiyoloji", src: "https://img.webme.com/pic/a/antakyasimgeofset/thumbnail_kardiyoloji.jpg" },
+  { name: "Akademi", src: "https://img.webme.com/pic/a/antakyasimgeofset/thumbnail_akademi.jpg" },
+  { name: "Defne", src: "https://img.webme.com/pic/a/antakyasimgeofset/thumbnail_defne.jpg" },
+  { name: "Mozaik", src: "https://img.webme.com/pic/a/antakyasimgeofset/thumbnail_mozaik.jpg" },
+  { name: "Nasdur", src: "https://img.webme.com/pic/a/antakyasimgeofset/thumbnail_nasdur.jpg" },
+  { name: "Matador", src: "https://img.webme.com/pic/a/antakyasimgeofset/thumbnail_matador.jpg" },
+  { name: "Has", src: "https://img.webme.com/pic/a/antakyasimgeofset/thumbnail_has.jpg" },
+  { name: "Tek Asya", src: "https://img.webme.com/pic/a/antakyasimgeofset/thumbnail_tekasya.jpg" },
+  { name: "Hat Boru", src: "https://img.webme.com/pic/a/antakyasimgeofset/thumbnail_hatboru.jpg" },
+  { name: "Üyeler", src: "https://img.webme.com/pic/a/antakyasimgeofset/xuyeler59861471533649.jpg.jpg.pagespeed.ic.DbDhlVtvKE.jpg" },
+];
+
 const FAQS = [
   { q: "Baskıya hazır dosyamı nasıl göndermeliyim?", a: "Ürün detay sayfasındaki dosya yükleme alanından PDF, AI, PSD, JPG veya PNG formatında dosyanızı yükleyebilirsiniz. En iyi sonuç için CMYK renk modunda, 300 DPI ve taşma payı (bleed) eklenmiş dosyalar öneririz." },
   { q: "Tasarımım yok, yardımcı olabilir misiniz?", a: "Elbette. Profesyonel grafik tasarım ekibimiz logo, kurumsal kimlik ve baskıya hazır tasarımlar oluşturur. Sipariş sırasında “Tasarım Desteği” seçeneğini işaretlemeniz yeterli." },
@@ -250,4 +271,4 @@ const FAQS = [
 
 window.CATEGORIES = window.CATEGORIES || CATEGORIES_FALLBACK;
 window.PRODUCTS = window.PRODUCTS || PRODUCTS_FALLBACK;
-Object.assign(window, { Icon, ProductMedia, MediaArt, FEATURES, STEPS, TESTIMONIALS, FAQS });
+Object.assign(window, { Icon, ProductMedia, MediaArt, FEATURES, STEPS, TESTIMONIALS, REFERENCES, FAQS });

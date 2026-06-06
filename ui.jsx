@@ -67,6 +67,28 @@ function ProductCard({ p, onAdd }) {
   );
 }
 
+function ReferencesSection({ center }) {
+  return (
+    <section className="section" style={{ background: center ? "var(--paper-2)" : "var(--paper)" }}>
+      <div className="wrap">
+        <SectionHead
+          eyebrow="Referanslarımız"
+          title="Güvenen markalar"
+          sub="Yıllar içinde birlikte çalıştığımız kurum ve işletmelerden bazıları."
+          center={center}
+        />
+        <div className="ref-grid" style={{ marginTop: center ? 48 : 40 }}>
+          {REFERENCES.map((r, i) => (
+            <div className="ref-item card" key={i} title={r.name}>
+              <img src={r.src} alt={r.name + " referans"} loading="lazy" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Toasts() {
   const { toasts } = useStore();
   if (!toasts.length) return null;
@@ -91,4 +113,4 @@ function quickAdd(store, p) {
   });
 }
 
-Object.assign(window, { Stars, SectionHead, CategoryCard, ProductCard, Toasts, quickAdd });
+Object.assign(window, { Stars, SectionHead, CategoryCard, ProductCard, ReferencesSection, Toasts, quickAdd });
