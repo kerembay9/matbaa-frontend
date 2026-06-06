@@ -94,12 +94,15 @@ function Toasts() {
   if (!toasts.length) return null;
   return (
     <div className="toast-wrap">
-      {toasts.map(t => (
-        <div className="toast" key={t.id}>
-          <span className="tdot"><Icon name="check" w={15} /></span>
-          {t.msg}
-        </div>
-      ))}
+      {toasts.map(t => {
+        const isError = t.type === "error";
+        return (
+          <div className={"toast" + (isError ? " toast--error" : "")} key={t.id}>
+            <span className="tdot"><Icon name={isError ? "close" : "check"} w={15} /></span>
+            {t.msg}
+          </div>
+        );
+      })}
     </div>
   );
 }

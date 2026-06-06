@@ -25,7 +25,7 @@ function siteCfg() {
 
 function TopBar() {
   const { nav } = useStore();
-  const { PHONE } = siteCfg();
+  const { PHONE, PHONE_DISPLAY } = siteCfg();
   return (
     <div className="topbar">
       <div className="wrap">
@@ -34,7 +34,7 @@ function TopBar() {
           <span className="tb-item tb-hide"><Icon name="shieldC" w={14} /> Baskı kalite garantisi</span>
         </div>
         <div className="tb-right">
-          <a className="tb-item" href={"tel:" + (PHONE || "02120000000")}><Icon name="phone" w={14} /> {PHONE || "0212 000 00 00"}</a>
+          <a className="tb-item" href={"tel:" + (PHONE || "03262252300")}><Icon name="phone" w={14} /> {PHONE_DISPLAY || PHONE || "0326 225 23 00"}</a>
           <a className="tb-item tb-hide" onClick={() => nav("quote")}>Kurumsal Teklif</a>
         </div>
       </div>
@@ -64,7 +64,6 @@ function Header() {
               <input placeholder="Kartvizit, broşür, afiş ara…" value={searchQ} onChange={e => setSearchQ(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") runSearch(searchQ); }} />
             </div>
             <div className="head-actions">
-              <button className="icon-btn" aria-label="İletişim" onClick={() => nav("contact")}><Icon name="user" w={19} /></button>
               <button className="icon-btn" aria-label="Sepet" onClick={() => nav("cart")}>
                 <Icon name="cart" w={19} />
                 {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
@@ -113,8 +112,8 @@ function Drawer() {
 
 function Footer() {
   const { nav } = useStore();
-  const { PHONE, EMAIL } = siteCfg();
-  const phoneDisplay = PHONE ? PHONE.replace(/(\d{4})(\d{3})(\d{2})(\d{2})/, "$1 $2 $3 $4") : "0212 000 00 00";
+  const { PHONE, PHONE_DISPLAY, EMAIL, ADDRESS, MAPS_URL } = siteCfg();
+  const phoneDisplay = PHONE_DISPLAY || PHONE || "0326 225 23 00";
   return (
     <footer className="site">
       <div className="wrap">
@@ -137,9 +136,9 @@ function Footer() {
           </div>
           <div className="fcol">
             <h4>İletişim</h4>
-            <a><Icon name="pin" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />Merkez Mah. Matbaacılar Sk. No:12, İstanbul</a>
-            <a href={"tel:" + (PHONE || "02120000000")}><Icon name="phone" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />{phoneDisplay}</a>
-            <a href={"mailto:" + (EMAIL || "info@simgematbaa.com")}><Icon name="mail" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />{EMAIL || "info@simgematbaa.com"}</a>
+            <a href={MAPS_URL || "#"} target="_blank" rel="noopener noreferrer"><Icon name="pin" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />{ADDRESS || "Antakya, Hatay"}</a>
+            <a href={"tel:" + (PHONE || "03262252300")}><Icon name="phone" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />{phoneDisplay}</a>
+            <a href={"mailto:" + (EMAIL || "antakyasimgeofset@hotmail.com")}><Icon name="mail" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />{EMAIL || "antakyasimgeofset@hotmail.com"}</a>
             <a><Icon name="clock" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />Hafta içi 09:00 – 18:30</a>
           </div>
         </div>

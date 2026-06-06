@@ -80,7 +80,7 @@ function CheckoutPage() {
   const [step, setStep] = useState(1);
   const [orderNo, setOrderNo] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", address: "", phone: "", city: "İstanbul", postalCode: "" });
+  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", address: "", phone: "", city: "Hatay", postalCode: "" });
   const [paymentMethod, setPaymentMethod] = useState("kart");
   const setField = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -134,7 +134,7 @@ function CheckoutPage() {
                 <button className="btn btn-primary" style={{ marginLeft: "auto" }} disabled={submitting} onClick={async () => {
                   if (step === 1) {
                     if (!form.email || !form.address || form.address.length < 5) {
-                      toast("E-posta ve adres zorunludur");
+                      toast("E-posta ve adres zorunludur", "error");
                       return;
                     }
                     setStep(2);
@@ -156,7 +156,7 @@ function CheckoutPage() {
                     await refreshCart();
                     setStep(3);
                   } catch (e) {
-                    toast(e.message || "Sipariş tamamlanamadı");
+                    toast(e.message || "Sipariş tamamlanamadı", "error");
                   } finally {
                     setSubmitting(false);
                   }
@@ -205,7 +205,7 @@ function DeliveryForm({ form, setField }) {
       <div className="field-row">
         <div className="field"><label>İl</label>
           <select value={form.city} onChange={e => setField("city", e.target.value)}>
-            <option>İstanbul</option><option>Ankara</option><option>İzmir</option><option>Bursa</option><option>Antalya</option>
+            <option>Hatay</option><option>İstanbul</option><option>Ankara</option><option>İzmir</option><option>Bursa</option><option>Antalya</option>
           </select>
         </div>
         <div className="field"><label>Posta Kodu</label><input placeholder="34000" value={form.postalCode} onChange={e => setField("postalCode", e.target.value)} /></div>
@@ -270,11 +270,11 @@ function QuotePage() {
 
   const submitQuote = async () => {
     if (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !form.details.trim()) {
-      store.toast("Ad, e-posta, telefon ve proje detayı zorunludur");
+      store.toast("Ad, e-posta, telefon ve proje detayı zorunludur", "error");
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      store.toast("Geçerli bir e-posta girin");
+      store.toast("Geçerli bir e-posta girin", "error");
       return;
     }
     const message = [
@@ -289,7 +289,7 @@ function QuotePage() {
       setSent(true);
     } catch (e) {
       const msg = e.message === "too_many" ? "Çok fazla talep gönderildi, lütfen daha sonra tekrar deneyin" : (e.message === "invalid" ? "Lütfen tüm zorunlu alanları kontrol edin" : (e.message || "Teklif gönderilemedi"));
-      store.toast(msg);
+      store.toast(msg, "error");
     } finally {
       setSubmitting(false);
     }

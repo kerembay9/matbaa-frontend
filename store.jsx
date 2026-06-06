@@ -51,7 +51,7 @@ function StoreProvider({ children }) {
       window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
       try { window.scrollTo(0, 0); } catch (e) {}
     } catch (e) {
-      toast(e.message || 'Arama yapılamadı');
+      toast(e.message || 'Arama yapılamadı', 'error');
     }
   }, [toast]);
 
@@ -60,9 +60,9 @@ function StoreProvider({ children }) {
     setRoute(r => ({ ...r, search: null }));
   }, []);
 
-  const toast = useCallback((msg) => {
+  const toast = useCallback((msg, type = "success") => {
     const id = ++tid.current;
-    setToasts(t => [...t, { id, msg }]);
+    setToasts(t => [...t, { id, msg, type: type === "error" ? "error" : "success" }]);
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 2600);
   }, []);
 
@@ -79,7 +79,7 @@ function StoreProvider({ children }) {
       await refreshCart();
       toast((item.name || 'Ürün') + " sepete eklendi");
     } catch (e) {
-      toast(e.message || 'Sepete eklenemedi');
+      toast(e.message || 'Sepete eklenemedi', 'error');
     }
   }, [refreshCart, toast]);
 
@@ -91,7 +91,7 @@ function StoreProvider({ children }) {
       await MatbaaApi.updateCartQty(lineKey, qty);
       await refreshCart();
     } catch (e) {
-      toast(e.message || 'Adet güncellenemedi');
+      toast(e.message || 'Adet güncellenemedi', 'error');
     }
   }, [cart, refreshCart, toast]);
 
@@ -100,7 +100,7 @@ function StoreProvider({ children }) {
       await MatbaaApi.removeFromCart(lineKey);
       await refreshCart();
     } catch (e) {
-      toast(e.message || 'Kaldırılamadı');
+      toast(e.message || 'Kaldırılamadı', 'error');
     }
   }, [refreshCart, toast]);
 

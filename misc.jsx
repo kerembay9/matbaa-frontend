@@ -109,8 +109,13 @@ function DesignHelpInline() {
   );
 }
 
+function siteCfg() {
+  return window.MATBAA_CONFIG || {};
+}
+
 function ContactPage() {
   const store = useStore();
+  const { ADDRESS, MAPS_URL, MAPS_EMBED_URL, PHONE, PHONE_DISPLAY, EMAIL } = siteCfg();
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
@@ -118,11 +123,11 @@ function ContactPage() {
 
   const submitContact = async () => {
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
-      store.toast("Ad, e-posta ve mesaj zorunludur");
+      store.toast("Ad, e-posta ve mesaj zorunludur", "error");
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      store.toast("Geçerli bir e-posta girin");
+      store.toast("Geçerli bir e-posta girin", "error");
       return;
     }
     setSubmitting(true);
@@ -136,7 +141,7 @@ function ContactPage() {
       setSent(true);
     } catch (e) {
       const msg = e.message === "too_many" ? "Çok fazla mesaj gönderildi, lütfen daha sonra tekrar deneyin" : (e.message === "invalid" ? "Lütfen tüm zorunlu alanları kontrol edin" : (e.message || "Mesaj gönderilemedi"));
-      store.toast(msg);
+      store.toast(msg, "error");
     } finally {
       setSubmitting(false);
     }
@@ -148,14 +153,24 @@ function ContactPage() {
       <section className="section-sm"><div className="wrap">
         <div className="contact-layout">
           <div>
-            {[["pin", "Adres", "Küçük Dalyan Mah. Atatürk Cad No19/d, Antakya, Hatay 31000"], ["phone", "Telefon", "0212 000 00 00"], ["mail", "E-posta", "info@simgematbaa.com"], ["clock", "Çalışma Saatleri", "Hafta içi 09:00 – 18:30"]].map(([ic, t, d], i) => (
+            {[["pin", "Adres", ADDRESS || "Antakya, Hatay", MAPS_URL], ["phone", "Telefon", PHONE_DISPLAY || PHONE || "0326 225 23 00", "tel:" + (PHONE || "03262252300")], ["mail", "E-posta", EMAIL || "antakyasimgeofset@hotmail.com", "mailto:" + (EMAIL || "antakyasimgeofset@hotmail.com")], ["clock", "Çalışma Saatleri", "Hafta içi 09:00 – 18:30", null]].map(([ic, t, d, href], i) => (
               <div className="card contact-info-card" key={i}>
                 <span className="cic"><Icon name={ic} w={22} /></span>
-                <div><small>{t}</small><b>{d}</b></div>
+                <div>
+                  <small>{t}</small>
+                  {href
+                    ? <b><a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel={href.startsWith("http") ? "noopener noreferrer" : undefined} style={{ color: "inherit", textDecoration: "none" }}>{d}</a></b>
+                    : <b>{d}</b>}
+                </div>
               </div>
             ))}
             <div className="map-ph">
-              <span style={{ position: "relative", color: "var(--muted)", display: "flex", gap: 8, alignItems: "center", fontFamily: "var(--font-head)", fontWeight: 600 }}><Icon name="pin" w={18} /> Harita görünümü</span>
+              {MAPS_EMBED_URL
+                ? <iframe title="Simge Matbaa konum" src={MAPS_EMBED_URL} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen></iframe>
+                : <span style={{ position: "relative", color: "var(--muted)", display: "flex", gap: 8, alignItems: "center", fontFamily: "var(--font-head)", fontWeight: 600 }}><Icon name="pin" w={18} /> Harita görünümü</span>}
+              {MAPS_URL && (
+                <a className="map-link" href={MAPS_URL} target="_blank" rel="noopener noreferrer">Google Maps'te aç <Icon name="arrow" w={14} /></a>
+              )}
             </div>
           </div>
           <div className="card form-card">
