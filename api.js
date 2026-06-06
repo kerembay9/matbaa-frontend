@@ -42,6 +42,33 @@ async function api(path, opts = {}) {
   return data;
 }
 
+function mapSearchItem(p) {
+  const known = (window.PRODUCTS || []).find(x => x.id === p.id || x.slug === p.slug);
+  if (known) return known;
+  const catSlug = p.category?.slug
+    || (window.CATEGORIES || []).find(c => c.id === p.categoryId)?.slug
+    || 'kartvizit';
+  const catMeta = (window.CATEGORY_META || {})[catSlug] || { kind: catSlug, tone: 'navy' };
+  const catName = p.category?.name
+    || (window.CATEGORIES || []).find(c => c.id === p.categoryId || c.slug === catSlug)?.name
+    || '';
+  return {
+    id: p.id,
+    slug: p.slug,
+    name: p.title || p.name,
+    cat: catName,
+    catId: catSlug,
+    kind: catMeta.kind,
+    tone: catMeta.tone,
+    price: p.price,
+    unit: '/ baskı',
+    rating: 4.8,
+    reviews: 0,
+    desc: p.description || '',
+    featured: p.featured,
+  };
+}
+
 function mapCartItem(i) {
   const slug = i.product?.category?.slug || 'kartvizit';
   const catMeta = (window.CATEGORY_META || {})[slug] || { kind: slug, tone: 'navy' };
@@ -68,7 +95,11 @@ const MatbaaApi = {
   updateCartQty: (lineKey, qty) => api('/api/cart', { method: 'PATCH', body: JSON.stringify({ lineKey, qty }) }),
   removeFromCart: (lineKey) => api('/api/cart', { method: 'DELETE', body: JSON.stringify({ lineKey }) }),
   checkout: (body) => api('/api/checkout', { method: 'POST', body: JSON.stringify(body) }),
+  submitContact: (body) => api('/api/contact', { method: 'POST', body: JSON.stringify(body) }),
+  submitQuote: (body) => api('/api/contact', { method: 'POST', body: JSON.stringify({ type: 'quote', ...body }) }),
+  search: (q) => api('/api/search?q=' + encodeURIComponent(q)).then(items => items.map(mapSearchItem)),
   mapCartItems: (cart) => (cart?.items || []).map(mapCartItem),
+  mapSearchItems: (items) => (items || []).map(mapSearchItem),
   cartCount: (cart) => (cart?.items || []).reduce((n, x) => n + x.qty, 0),
   cartTotal: (cart) => (cart?.items || []).reduce((n, x) => n + (x.unitPrice ?? 0) * x.qty, 0),
 };

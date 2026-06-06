@@ -5,8 +5,6 @@
 function CartPage() {
   const store = useStore();
   const { cart, cartTotal, updateQty, removeItem, nav } = store;
-  const [promo, setPromo] = useState("");
-  const shipping = 0;
   const kdv = Math.round(cartTotal * 0.2);
 
   if (!cart.length) {
@@ -60,10 +58,6 @@ function CartPage() {
             <div className="srow"><span>Ara toplam</span><span>{tl(cartTotal - kdv)}</span></div>
             <div className="srow"><span>KDV (%20)</span><span>{tl(kdv)}</span></div>
             <div className="srow"><span>Kargo</span><span style={{ color: "var(--ok)", fontWeight: 700 }}>Ücretsiz</span></div>
-            <div className="promo">
-              <input placeholder="İndirim kodu" value={promo} onChange={e => setPromo(e.target.value)} />
-              <button className="btn btn-ink btn-sm" onClick={() => store.toast(promo ? "Kod uygulandı (demo)" : "Kod girin")}>Uygula</button>
-            </div>
             <div className="srow total"><span>Toplam</span><b>{tl(cartTotal)}</b></div>
             <button className="btn btn-primary btn-lg btn-block" style={{ marginTop: 18 }} onClick={() => nav("checkout")}>
               Ödemeye Geç <Icon name="arrow" w={17} />
@@ -86,7 +80,8 @@ function CheckoutPage() {
   const [step, setStep] = useState(1);
   const [orderNo, setOrderNo] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({ email: "", address: "", phone: "" });
+  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", address: "", phone: "", city: "İstanbul", postalCode: "" });
+  const [paymentMethod, setPaymentMethod] = useState("kart");
   const setField = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   if (!cart.length && step < 3) {
@@ -131,7 +126,7 @@ function CheckoutPage() {
           <div className="cart-layout">
             <div>
               {step === 1 && <DeliveryForm form={form} setField={setField} />}
-              {step === 2 && <PaymentForm />}
+              {step === 2 && <PaymentForm method={paymentMethod} setMethod={setPaymentMethod} />}
               <div style={{ display: "flex", gap: 12, marginTop: 22 }}>
                 {step === 1
                   ? <button className="btn btn-ghost" onClick={() => nav("cart")}>Sepete dön</button>
@@ -151,6 +146,11 @@ function CheckoutPage() {
                       email: form.email,
                       address: form.address,
                       phone: form.phone || undefined,
+                      firstName: form.firstName || undefined,
+                      lastName: form.lastName || undefined,
+                      city: form.city || undefined,
+                      postalCode: form.postalCode || undefined,
+                      paymentMethod,
                     });
                     setOrderNo(res.orderId);
                     await refreshCart();
@@ -194,8 +194,8 @@ function DeliveryForm({ form, setField }) {
     <div className="card form-card">
       <h3><span className="fn">1</span> Teslimat Bilgileri</h3>
       <div className="field-row">
-        <div className="field"><label>Ad <span className="req">*</span></label><input placeholder="Adınız" /></div>
-        <div className="field"><label>Soyad <span className="req">*</span></label><input placeholder="Soyadınız" /></div>
+        <div className="field"><label>Ad <span className="req">*</span></label><input placeholder="Adınız" value={form.firstName} onChange={e => setField("firstName", e.target.value)} /></div>
+        <div className="field"><label>Soyad <span className="req">*</span></label><input placeholder="Soyadınız" value={form.lastName} onChange={e => setField("lastName", e.target.value)} /></div>
       </div>
       <div className="field-row">
         <div className="field"><label>E-posta <span className="req">*</span></label><input placeholder="ornek@mail.com" type="email" value={form.email} onChange={e => setField("email", e.target.value)} /></div>
@@ -204,20 +204,17 @@ function DeliveryForm({ form, setField }) {
       <div className="field"><label>Adres <span className="req">*</span></label><textarea placeholder="Mahalle, cadde, sokak, no, daire" value={form.address} onChange={e => setField("address", e.target.value)}></textarea></div>
       <div className="field-row">
         <div className="field"><label>İl</label>
-          <select><option>İstanbul</option><option>Ankara</option><option>İzmir</option><option>Bursa</option><option>Antalya</option></select>
+          <select value={form.city} onChange={e => setField("city", e.target.value)}>
+            <option>İstanbul</option><option>Ankara</option><option>İzmir</option><option>Bursa</option><option>Antalya</option>
+          </select>
         </div>
-        <div className="field"><label>Posta Kodu</label><input placeholder="34000" /></div>
+        <div className="field"><label>Posta Kodu</label><input placeholder="34000" value={form.postalCode} onChange={e => setField("postalCode", e.target.value)} /></div>
       </div>
-      <label className="filter-opt" style={{ marginTop: 4 }}>
-        <span className="box" style={{ background: "var(--accent)", borderColor: "var(--accent)", color: "#fff" }}><Icon name="check" w={12} /></span>
-        Fatura adresim teslimat adresimle aynı
-      </label>
     </div>
   );
 }
 
-function PaymentForm() {
-  const [method, setMethod] = useState("kart");
+function PaymentForm({ method, setMethod }) {
   return (
     <div className="card form-card">
       <h3><span className="fn">2</span> Ödeme Yöntemi</h3>
@@ -266,8 +263,37 @@ function SuccessView({ orderNo, total, onHome, onProducts }) {
 function QuotePage() {
   const store = useStore();
   const [sent, setSent] = useState(false);
-  const [file, setFile] = useState(null);
-  const [cat, setCat] = useState("Kartvizit");
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", cat: "Kartvizit", quantity: "", details: "" });
+  const setField = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const waUrl = (window.MATBAA_CONFIG || {}).WHATSAPP_URL || "https://wa.me/902120000000";
+
+  const submitQuote = async () => {
+    if (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !form.details.trim()) {
+      store.toast("Ad, e-posta, telefon ve proje detayı zorunludur");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      store.toast("Geçerli bir e-posta girin");
+      return;
+    }
+    const message = [
+      form.company ? "Firma: " + form.company : null,
+      "Ürün: " + form.cat,
+      form.quantity ? "Tahmini adet: " + form.quantity : null,
+      "Detay: " + form.details,
+    ].filter(Boolean).join("\n");
+    setSubmitting(true);
+    try {
+      await MatbaaApi.submitQuote({ name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim(), message });
+      setSent(true);
+    } catch (e) {
+      const msg = e.message === "too_many" ? "Çok fazla talep gönderildi, lütfen daha sonra tekrar deneyin" : (e.message === "invalid" ? "Lütfen tüm zorunlu alanları kontrol edin" : (e.message || "Teklif gönderilemedi"));
+      store.toast(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (sent) {
     return (
@@ -296,31 +322,25 @@ function QuotePage() {
           <div className="card form-card">
             <h3><span className="fn"><Icon name="tag" w={15} /></span> Teklif Formu</h3>
             <div className="field-row">
-              <div className="field"><label>Ad Soyad <span className="req">*</span></label><input placeholder="Adınız Soyadınız" /></div>
-              <div className="field"><label>Firma (opsiyonel)</label><input placeholder="Firma adı" /></div>
+              <div className="field"><label>Ad Soyad <span className="req">*</span></label><input placeholder="Adınız Soyadınız" value={form.name} onChange={e => setField("name", e.target.value)} /></div>
+              <div className="field"><label>Firma (opsiyonel)</label><input placeholder="Firma adı" value={form.company} onChange={e => setField("company", e.target.value)} /></div>
             </div>
             <div className="field-row">
-              <div className="field"><label>E-posta <span className="req">*</span></label><input placeholder="ornek@mail.com" /></div>
-              <div className="field"><label>Telefon <span className="req">*</span></label><input placeholder="0(5__) ___ __ __" /></div>
+              <div className="field"><label>E-posta <span className="req">*</span></label><input placeholder="ornek@mail.com" type="email" value={form.email} onChange={e => setField("email", e.target.value)} /></div>
+              <div className="field"><label>Telefon <span className="req">*</span></label><input placeholder="0(5__) ___ __ __" value={form.phone} onChange={e => setField("phone", e.target.value)} /></div>
             </div>
             <div className="field-row">
               <div className="field"><label>Ürün</label>
-                <select value={cat} onChange={e => setCat(e.target.value)}>
+                <select value={form.cat} onChange={e => setField("cat", e.target.value)}>
                   {CATEGORIES.map(c => <option key={c.id}>{c.name}</option>)}
                 </select>
               </div>
-              <div className="field"><label>Tahmini Adet</label><input placeholder="Örn. 1000" /></div>
+              <div className="field"><label>Tahmini Adet</label><input placeholder="Örn. 1000" value={form.quantity} onChange={e => setField("quantity", e.target.value)} /></div>
             </div>
-            <div className="field"><label>Proje Detayı <span className="req">*</span></label><textarea placeholder="Ebat, kağıt, kaplama, teslim tarihi gibi detayları yazın…"></textarea></div>
-            <div className="field">
-              <label>Dosya / Örnek (opsiyonel)</label>
-              <label className={"upload" + (file ? " has" : "")}>
-                <input type="file" hidden onChange={e => setFile(e.target.files[0] ? e.target.files[0].name : null)} />
-                <div className="uic"><Icon name={file ? "check" : "upload"} w={23} /></div>
-                {file ? <b style={{ color: "var(--ok)" }}>{file}</b> : <React.Fragment><b>Dosya yükle</b><small>PDF, AI, PSD, JPG, PNG</small></React.Fragment>}
-              </label>
-            </div>
-            <button className="btn btn-primary btn-lg btn-block" style={{ marginTop: 8 }} onClick={() => setSent(true)}>Teklif Talebi Gönder <Icon name="arrow" w={17} /></button>
+            <div className="field"><label>Proje Detayı <span className="req">*</span></label><textarea placeholder="Ebat, kağıt, kaplama, teslim tarihi gibi detayları yazın…" value={form.details} onChange={e => setField("details", e.target.value)}></textarea></div>
+            <button className="btn btn-primary btn-lg btn-block" style={{ marginTop: 8 }} disabled={submitting} onClick={submitQuote}>
+              {submitting ? "Gönderiliyor…" : "Teklif Talebi Gönder"} <Icon name="arrow" w={17} />
+            </button>
           </div>
 
           <div>
@@ -336,7 +356,7 @@ function QuotePage() {
             <div className="card" style={{ padding: 24, marginTop: 16, background: "var(--ink)", color: "#fff" }}>
               <h3 style={{ color: "#fff", fontSize: 17, marginBottom: 8 }}>Acele mi ediyorsunuz?</h3>
               <p style={{ color: "rgba(255,255,255,.7)", fontSize: 14, marginBottom: 16 }}>WhatsApp hattımızdan anında bilgi alın.</p>
-              <button className="btn btn-block" style={{ background: "#25d366", color: "#fff" }}><Icon name="wa" w={18} /> WhatsApp ile Yazın</button>
+              <a className="btn btn-block" href={waUrl} target="_blank" rel="noopener noreferrer" style={{ background: "#25d366", color: "#fff", textAlign: "center" }}><Icon name="wa" w={18} /> WhatsApp ile Yazın</a>
             </div>
           </div>
         </div>

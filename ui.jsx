@@ -47,7 +47,6 @@ function ProductCard({ p, onAdd }) {
       <div className="cursor-pointer" style={{ position: "relative" }} onClick={go}>
         <ProductMedia kind={p.kind} tone={p.tone} label={p.kind} />
         {p.tag && <span className={"prod-tag chip " + (p.tagType || "accent")}>{p.tag}</span>}
-        <button className="prod-fav" onClick={(e) => { e.stopPropagation(); }} aria-label="Favori"><Icon name="heart" w={16} /></button>
       </div>
       <div className="prod-body">
         <span className="prod-cat">{p.cat}</span>

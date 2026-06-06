@@ -5,10 +5,13 @@
 /* ---------- Ürünler sayfası ---------- */
 function ProductsPage() {
   const store = useStore();
+  const { route, searchResults, clearSearch } = store;
   const [active, setActive] = useState("hepsi");
   const [sort, setSort] = useState("populer");
+  const isSearch = !!(route.search && searchResults);
 
-  const filtered = PRODUCTS.filter(p => active === "hepsi" || p.catId === active);
+  const source = isSearch ? searchResults : PRODUCTS;
+  const filtered = source.filter(p => active === "hepsi" || p.catId === active);
   const sorted = [...filtered].sort((a, b) => {
     if (sort === "ucuz") return a.price - b.price;
     if (sort === "pahali") return b.price - a.price;
@@ -32,21 +35,11 @@ function ProductsPage() {
             <aside className="filter-panel">
               <div className="filter-group">
                 <h4>Kategori</h4>
-                <FilterOpt label="Tüm Ürünler" on={active === "hepsi"} count={PRODUCTS.length} onClick={() => setActive("hepsi")} />
+                <FilterOpt label="Tüm Ürünler" on={active === "hepsi"} count={source.length} onClick={() => setActive("hepsi")} />
                 {CATEGORIES.slice(0, 8).map(c => {
-                  const cnt = PRODUCTS.filter(p => p.catId === c.id).length;
+                  const cnt = source.filter(p => p.catId === c.id).length;
                   return <FilterOpt key={c.id} label={c.name} on={active === c.id} count={cnt} onClick={() => setActive(c.id)} />;
                 })}
-              </div>
-              <div className="filter-group">
-                <h4>Teslimat</h4>
-                <FilterOpt label="Aynı gün" count={6} />
-                <FilterOpt label="1–3 iş günü" on count={PRODUCTS.length} />
-              </div>
-              <div className="filter-group">
-                <h4>Özellik</h4>
-                <FilterOpt label="Tasarım desteği var" count={10} />
-                <FilterOpt label="Toplu indirim" count={8} />
               </div>
               <div style={{ paddingTop: 18 }}>
                 <button className="btn btn-ink btn-block" onClick={() => store.nav("quote")}><Icon name="tag" w={16} /> Özel Teklif Al</button>
@@ -68,6 +61,13 @@ function ProductsPage() {
                   </div>
                 </div>
               </div>
+
+              {isSearch && (
+                <div style={{ display: "flex", gap: 9, alignItems: "center", marginBottom: 18, flexWrap: "wrap" }}>
+                  <span className="chip ink">Arama: {route.search}</span>
+                  <button className="btn btn-ghost btn-sm" onClick={clearSearch}>Aramayı temizle</button>
+                </div>
+              )}
 
               {/* category quick chips */}
               <div style={{ display: "flex", gap: 9, flexWrap: "wrap", marginBottom: 22 }}>
@@ -132,7 +132,6 @@ function ProductDetailPage({ id }) {
   const [tier, setTier] = useState(2);
   const [thumb, setThumb] = useState(0);
   const [tab, setTab] = useState("aciklama");
-  const [file, setFile] = useState(null);
   const [needDesign, setNeedDesign] = useState(false);
 
   const unitBase = p.price / 3.4; // normalize to per-100 baseline
@@ -153,7 +152,7 @@ function ProductDetailPage({ id }) {
       lineKey,
       name: p.name,
       optionsJson: { ebat: sel.ebat, kagit: sel.kagit, kaplama: sel.kaplama, yon: sel.yon, tier, needDesign },
-      optionsLabel: optStr + (needDesign ? " · + Tasarım" : "") + (file ? " · dosya yüklendi" : ""),
+      optionsLabel: optStr + (needDesign ? " · + Tasarım" : ""),
       qty: 1,
       unitPrice: total,
       lineTotal: total,
@@ -212,17 +211,8 @@ function ProductDetailPage({ id }) {
                 </div>
               </div>
 
-              {/* file upload */}
               <div className="opt-block">
-                <div className="olab"><span>Baskı Dosyası</span><small>PDF, AI, PSD, JPG — max 50MB</small></div>
-                <label className={"upload" + (file ? " has" : "")}>
-                  <input type="file" hidden onChange={e => setFile(e.target.files[0] ? e.target.files[0].name : null)} />
-                  <div className="uic"><Icon name={file ? "check" : "upload"} w={23} /></div>
-                  {file
-                    ? <React.Fragment><b style={{ color: "var(--ok)" }}>{file}</b><small>Dosya yüklendi · değiştirmek için tıklayın</small></React.Fragment>
-                    : <React.Fragment><b>Dosyanı buraya sürükle veya tıkla</b><small>CMYK · 300 DPI · taşma payı önerilir</small></React.Fragment>}
-                </label>
-                <label className="filter-opt" style={{ marginTop: 12 }} onClick={() => setNeedDesign(v => !v)}>
+                <label className="filter-opt" onClick={() => setNeedDesign(v => !v)}>
                   <span className={"box" + (needDesign ? "" : "")} style={needDesign ? { background: "var(--accent)", borderColor: "var(--accent)", color: "#fff" } : null}><Icon name="check" w={12} /></span>
                   Dosyam yok, tasarım desteği istiyorum <span className="cnt">+{tl(750)}</span>
                 </label>

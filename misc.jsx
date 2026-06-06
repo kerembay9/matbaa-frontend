@@ -111,13 +111,43 @@ function DesignHelpInline() {
 function ContactPage() {
   const store = useStore();
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const setField = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const submitContact = async () => {
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      store.toast("Ad, e-posta ve mesaj zorunludur");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      store.toast("Geçerli bir e-posta girin");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await MatbaaApi.submitContact({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        subject: form.subject.trim() || undefined,
+        message: form.message.trim(),
+      });
+      setSent(true);
+    } catch (e) {
+      const msg = e.message === "too_many" ? "Çok fazla mesaj gönderildi, lütfen daha sonra tekrar deneyin" : (e.message === "invalid" ? "Lütfen tüm zorunlu alanları kontrol edin" : (e.message || "Mesaj gönderilemedi"));
+      store.toast(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="page">
       <PageHead crumb="İletişim" title="Bize Ulaşın" sub="Sorularınız, özel talepleriniz ve iş birlikleri için buradayız." />
       <section className="section-sm"><div className="wrap">
         <div className="contact-layout">
           <div>
-            {[["pin", "Adres", "Merkez Mah. Matbaacılar Sk. No:12, İstanbul"], ["phone", "Telefon", "0212 000 00 00"], ["mail", "E-posta", "info@simgematbaa.com"], ["clock", "Çalışma Saatleri", "Hafta içi 09:00 – 18:30"]].map(([ic, t, d], i) => (
+            {[["pin", "Adres", "Küçük Dalyan Mah. Atatürk Cad No19/d, Antakya, Hatay 31000"], ["phone", "Telefon", "0212 000 00 00"], ["mail", "E-posta", "info@simgematbaa.com"], ["clock", "Çalışma Saatleri", "Hafta içi 09:00 – 18:30"]].map(([ic, t, d], i) => (
               <div className="card contact-info-card" key={i}>
                 <span className="cic"><Icon name={ic} w={22} /></span>
                 <div><small>{t}</small><b>{d}</b></div>
@@ -133,18 +163,20 @@ function ContactPage() {
                 <div className="sic" style={{ width: 72, height: 72, margin: "0 auto 18px" }}><Icon name="check" w={36} /></div>
                 <h3 style={{ fontSize: 22, marginBottom: 8 }}>Mesajınız gönderildi</h3>
                 <p className="text-muted" style={{ marginBottom: 20 }}>En kısa sürede size geri dönüş yapacağız.</p>
-                <button className="btn btn-ghost" onClick={() => setSent(false)}>Yeni mesaj</button>
+                <button className="btn btn-ghost" onClick={() => { setSent(false); setForm({ name: "", email: "", subject: "", message: "" }); }}>Yeni mesaj</button>
               </div>
             ) : (
               <React.Fragment>
                 <h3><span className="fn"><Icon name="mail" w={15} /></span> Mesaj Gönderin</h3>
                 <div className="field-row">
-                  <div className="field"><label>Ad Soyad <span className="req">*</span></label><input placeholder="Adınız" /></div>
-                  <div className="field"><label>E-posta <span className="req">*</span></label><input placeholder="ornek@mail.com" /></div>
+                  <div className="field"><label>Ad Soyad <span className="req">*</span></label><input placeholder="Adınız" value={form.name} onChange={e => setField("name", e.target.value)} /></div>
+                  <div className="field"><label>E-posta <span className="req">*</span></label><input placeholder="ornek@mail.com" type="email" value={form.email} onChange={e => setField("email", e.target.value)} /></div>
                 </div>
-                <div className="field"><label>Konu</label><input placeholder="Mesaj konusu" /></div>
-                <div className="field"><label>Mesajınız <span className="req">*</span></label><textarea placeholder="Size nasıl yardımcı olabiliriz?"></textarea></div>
-                <button className="btn btn-primary btn-lg btn-block" onClick={() => setSent(true)}>Gönder <Icon name="arrow" w={17} /></button>
+                <div className="field"><label>Konu</label><input placeholder="Mesaj konusu" value={form.subject} onChange={e => setField("subject", e.target.value)} /></div>
+                <div className="field"><label>Mesajınız <span className="req">*</span></label><textarea placeholder="Size nasıl yardımcı olabiliriz?" value={form.message} onChange={e => setField("message", e.target.value)}></textarea></div>
+                <button className="btn btn-primary btn-lg btn-block" disabled={submitting} onClick={submitContact}>
+                  {submitting ? "Gönderiliyor…" : "Gönder"} <Icon name="arrow" w={17} />
+                </button>
               </React.Fragment>
             )}
           </div>

@@ -19,8 +19,13 @@ function Logo({ onClick, footer }) {
   );
 }
 
+function siteCfg() {
+  return window.MATBAA_CONFIG || {};
+}
+
 function TopBar() {
   const { nav } = useStore();
+  const { PHONE } = siteCfg();
   return (
     <div className="topbar">
       <div className="wrap">
@@ -29,7 +34,7 @@ function TopBar() {
           <span className="tb-item tb-hide"><Icon name="shieldC" w={14} /> Baskı kalite garantisi</span>
         </div>
         <div className="tb-right">
-          <a className="tb-item" onClick={() => nav("contact")}><Icon name="phone" w={14} /> 0212 000 00 00</a>
+          <a className="tb-item" href={"tel:" + (PHONE || "02120000000")}><Icon name="phone" w={14} /> {PHONE || "0212 000 00 00"}</a>
           <a className="tb-item tb-hide" onClick={() => nav("quote")}>Kurumsal Teklif</a>
         </div>
       </div>
@@ -38,7 +43,9 @@ function TopBar() {
 }
 
 function Header() {
-  const { route, nav, cartCount, setDrawerOpen } = useStore();
+  const { route, nav, cartCount, setDrawerOpen, runSearch } = useStore();
+  const [searchQ, setSearchQ] = useState(route.search || "");
+  useEffect(() => { if (!route.search) setSearchQ(""); }, [route.search]);
   const active = route.page;
   return (
     <React.Fragment>
@@ -54,10 +61,10 @@ function Header() {
             </nav>
             <div className="searchbar">
               <Icon name="search" w={17} />
-              <input placeholder="Kartvizit, broşür, afiş ara…" onKeyDown={(e) => { if (e.key === "Enter") nav("products"); }} />
+              <input placeholder="Kartvizit, broşür, afiş ara…" value={searchQ} onChange={e => setSearchQ(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") runSearch(searchQ); }} />
             </div>
             <div className="head-actions">
-              <button className="icon-btn" aria-label="Hesabım" onClick={() => nav("contact")}><Icon name="user" w={19} /></button>
+              <button className="icon-btn" aria-label="İletişim" onClick={() => nav("contact")}><Icon name="user" w={19} /></button>
               <button className="icon-btn" aria-label="Sepet" onClick={() => nav("cart")}>
                 <Icon name="cart" w={19} />
                 {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
@@ -106,6 +113,8 @@ function Drawer() {
 
 function Footer() {
   const { nav } = useStore();
+  const { PHONE, EMAIL } = siteCfg();
+  const phoneDisplay = PHONE ? PHONE.replace(/(\d{4})(\d{3})(\d{2})(\d{2})/, "$1 $2 $3 $4") : "0212 000 00 00";
   return (
     <footer className="site">
       <div className="wrap">
@@ -113,9 +122,6 @@ function Footer() {
           <div>
             <Logo onClick={() => nav("home")} footer />
             <p className="fdesc">Kartvizitten brandaya, davetiyeden ambalaja tüm baskı ihtiyaçlarınız için online sipariş platformu. Kalite, hız ve güven bir arada.</p>
-            <div className="fsocial">
-              <a aria-label="Instagram">https://www.instagram.com/antakyasimgeofset/<Icon name="ig" w={17} /></a>
-            </div>
           </div>
           <div className="fcol">
             <h4>Ürünler</h4>
@@ -132,8 +138,8 @@ function Footer() {
           <div className="fcol">
             <h4>İletişim</h4>
             <a><Icon name="pin" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />Merkez Mah. Matbaacılar Sk. No:12, İstanbul</a>
-            <a><Icon name="phone" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />0212 000 00 00</a>
-            <a><Icon name="mail" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />info@simgematbaa.com</a>
+            <a href={"tel:" + (PHONE || "02120000000")}><Icon name="phone" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />{phoneDisplay}</a>
+            <a href={"mailto:" + (EMAIL || "info@simgematbaa.com")}><Icon name="mail" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />{EMAIL || "info@simgematbaa.com"}</a>
             <a><Icon name="clock" w={15} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />Hafta içi 09:00 – 18:30</a>
           </div>
         </div>
@@ -143,9 +149,6 @@ function Footer() {
             <i></i><i></i><i></i><i></i>
             <span style={{ marginLeft: 8, fontFamily: "var(--font-head)", letterSpacing: ".04em" }}>CMYK ile basılmıştır</span>
           </span>
-          <span style={{ display: "flex", gap: 16 }}>
-            <a>Gizlilik</a><a>Kullanım Koşulları</a><a>KVKK</a>
-          </span>
         </div>
       </div>
     </footer>
@@ -153,10 +156,11 @@ function Footer() {
 }
 
 function WhatsApp() {
+  const { WHATSAPP_URL } = siteCfg();
   return (
-    <button className="wa-float" aria-label="WhatsApp ile iletişim" title="WhatsApp ile yazın">
+    <a className="wa-float" href={WHATSAPP_URL || "https://wa.me/902120000000"} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp ile iletişim" title="WhatsApp ile yazın">
       <Icon name="wa" w={30} />
-    </button>
+    </a>
   );
 }
 

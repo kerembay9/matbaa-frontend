@@ -7,7 +7,8 @@ const StoreCtx = createContext(null);
 const useStore = () => useContext(StoreCtx);
 
 function StoreProvider({ children }) {
-  const [route, setRoute] = useState({ page: "home", param: null });
+  const [route, setRoute] = useState({ page: "home", param: null, search: null });
+  const [searchResults, setSearchResults] = useState(null);
   const [cart, setCart] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
   const [catalogLoading, setCatalogLoading] = useState(true);
@@ -31,11 +32,32 @@ function StoreProvider({ children }) {
     refreshCart();
   }, [refreshCart]);
 
-  const nav = useCallback((page, param = null) => {
-    setRoute({ page, param });
+  const nav = useCallback((page, param = null, search = null) => {
+    setRoute({ page, param, search: search || null });
+    if (!search) setSearchResults(null);
     setDrawerOpen(false);
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
     try { window.scrollTo(0, 0); } catch (e) {}
+  }, []);
+
+  const runSearch = useCallback(async (q) => {
+    const query = (q || '').trim();
+    if (!query) return;
+    try {
+      const results = await MatbaaApi.search(query);
+      setSearchResults(results);
+      setRoute({ page: 'products', param: null, search: query });
+      setDrawerOpen(false);
+      window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+      try { window.scrollTo(0, 0); } catch (e) {}
+    } catch (e) {
+      toast(e.message || 'Arama yapılamadı');
+    }
+  }, [toast]);
+
+  const clearSearch = useCallback(() => {
+    setSearchResults(null);
+    setRoute(r => ({ ...r, search: null }));
   }, []);
 
   const toast = useCallback((msg) => {
@@ -91,6 +113,7 @@ function StoreProvider({ children }) {
 
   const value = {
     route, nav, cart, cartCount, cartTotal, cartLoading, catalogLoading,
+    searchResults, runSearch, clearSearch,
     addToCart, updateQty, removeItem, clearCart, refreshCart,
     toast, toasts, drawerOpen, setDrawerOpen,
   };
